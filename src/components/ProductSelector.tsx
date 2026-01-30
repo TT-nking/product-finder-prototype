@@ -109,7 +109,7 @@ function StepQuestion({ step, answers, onAnswer, onNext, onBack }: { step: (type
     );
   }
 
-  const options = 'options' in step ? step.options : [];
+  const options = ('options' in step ? step.options : undefined) ?? [];
   const answerKey = step.id === 'env' ? 'env' : step.id === 'setup' ? 'setup' : 'use';
   const currentValue = answers[answerKey];
 
