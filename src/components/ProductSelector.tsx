@@ -22,6 +22,30 @@ type Answers = {
 
 const products: Product[] = (data as { products: Product[] }).products;
 
+/** Architectural edge copy per product and use case—aligns result with the journey they self-selected (Tenstorrent portfolio). */
+const HIGHLIGHTS_BY_JOURNEY: Record<string, { research: string; efficiency: string; fleet: string }> = {
+  'bh-quietbox': {
+    research: '1MB of SRAM per tile for complex physics code and custom VM development. 720 MB total SRAM and 480 Tensix Cores in a quiet, liquid-cooled desktop—built for experimentation and heavy SRAM workloads.',
+    efficiency: 'Liquid-cooled desktop with 4 Blackhole processors and 128 GB GDDR6. Strong performance per dollar for inference and development without the noise of a server.',
+    fleet: 'Single system runs single-user models up to ~80B parameters or multi-user, multi-model up to ~20B. One box, ready to plug in and run.',
+  },
+  'bh-p150a': {
+    research: '120 Tensix Cores and 32 GB GDDR6 per card, with full access to the metal via TT-Metalium and TT-NN. Link cards with QSFP-DD to scale your research cluster.',
+    efficiency: 'Native block float format support to drive down operational costs vs cloud H100s. Build a cost-efficient inference cluster with cards that pay for themselves.',
+    fleet: 'QSFP-DD 800G linking lets you pool memory and scale across cards. Build your own multi-card cluster with standard PCIe and open software.',
+  },
+  'wh-loudbox': {
+    research: 'Modular 4U design with Wormhole processors—flexible density for research and multi-user workloads. TT-Forge and TT-NN support diverse model portfolios.',
+    efficiency: '4U rack density with strong performance per watt. Multi-tenant capable so you can share one system across cost-sensitive inference workloads.',
+    fleet: 'Modular 4U design for multi-user model serving across a diverse model portfolio. Fleet-ready with TT-Forge and TT-NN.',
+  },
+  galaxy: {
+    research: '32 Wormhole processors and 2,560 Tensix Cores in one rack-mounted system. Built for research institutions and HPC—subdivide across hosts or run as one. 384 GB GDDR6, globally addressable.',
+    efficiency: 'Ultra-dense rack system with 9.3 PetaFLOPS (FP8). Superior performance density for cost—scale without reprogramming models or re-architecting infrastructure.',
+    fleet: 'Pre-configured rack system with 32 Wormhole processors and 41.6 Tbps internal Ethernet. Scale from one host to many; multi-tenant and multi-model ready with TT-Forge and TT-NN.',
+  },
+};
+
 const RECOMMENDATION_MAP: Record<string, string> = {
   'desk|box|research': 'bh-quietbox',
   'desk|box|efficiency': 'bh-quietbox',
@@ -78,14 +102,23 @@ function getRecommendedProduct(answers: Answers): Product {
   return fallback ?? products[0];
 }
 
-function ResultCard({ product }: { product: Product }) {
+function getArchitecturalEdge(product: Product, useCase: string): string {
+  const byUse = HIGHLIGHTS_BY_JOURNEY[product.id];
+  if (byUse && (useCase === 'research' || useCase === 'efficiency' || useCase === 'fleet')) {
+    return byUse[useCase];
+  }
+  return product.highlight;
+}
+
+function ResultCard({ product, useCase }: { product: Product; useCase: string }) {
+  const architecturalEdge = getArchitecturalEdge(product, useCase);
   return (
     <div className="bg-slate-plus p-8 text-tt-black text-left rounded-lg max-w-2xl border border-slate-plus" style={{ borderLeftColor: product.brand_color, borderLeftWidth: '4px' }}>
       <h1 className="text-4xl md:text-5xl font-light mb-2 font-display text-tt-black">{product.name}</h1>
       <p className="text-xl font-medium mb-6 font-display text-tt-black/80">{product.tagline}</p>
       <div className="border-l-2 pl-4 mb-8" style={{ borderColor: product.brand_color }}>
         <p className="text-sm font-mono uppercase tracking-widest text-tt-black/50 mb-1">Architectural edge</p>
-        <p className="text-lg font-body">{product.highlight}</p>
+        <p className="text-lg font-body">{architecturalEdge}</p>
       </div>
       {product.software?.length > 0 && <p className="text-sm font-mono text-tt-black/60 mb-6">Software: {product.software.join(', ')}</p>}
       <button className="text-white px-8 py-3 font-medium font-body hover:opacity-90 transition-opacity rounded" style={{ backgroundColor: product.brand_color }}>{product.cta}</button>
@@ -165,7 +198,7 @@ export function ProductSelector() {
         )}
         {isResultStep ? (
           <div className="flex flex-col items-start">
-            <ResultCard product={recommendedProduct} />
+            <ResultCard product={recommendedProduct} useCase={answers.use} />
             <button type="button" onClick={() => setStepIndex(STEPS.length - 1)} className="mt-6 text-sm font-mono text-tt-black/50 hover:text-tt-black">← Change my answers</button>
           </div>
         ) : currentStep ? (
