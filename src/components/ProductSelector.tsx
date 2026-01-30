@@ -46,6 +46,43 @@ const HIGHLIGHTS_BY_JOURNEY: Record<string, { research: string; efficiency: stri
   },
 };
 
+/** Runner-up product id for each recommended product (alternative in portfolio—e.g. box vs cards, or scale up/down). */
+const RUNNER_UP_MAP: Record<string, string> = {
+  'bh-quietbox': 'bh-p150a',
+  'bh-p150a': 'bh-quietbox',
+  'wh-loudbox': 'galaxy',
+  galaxy: 'wh-loudbox',
+};
+
+/** Battle-card specs per product (Tenstorrent portfolio—prices and specs from tenstorrent.com). */
+type ProductSpecs = { price: string; memory: string; compute: string; formFactor: string };
+const SPECS_BY_PRODUCT: Record<string, ProductSpecs> = {
+  'bh-quietbox': {
+    price: '$11,999',
+    memory: '128 GB GDDR6',
+    compute: '664 TFLOPs (BLOCKFP8) per chip × 4',
+    formFactor: 'Liquid-cooled desktop',
+  },
+  'bh-p150a': {
+    price: '$1,399',
+    memory: '32 GB GDDR6',
+    compute: '664 TFLOPs (BLOCKFP8)',
+    formFactor: 'PCIe card, 300W',
+  },
+  'wh-loudbox': {
+    price: 'Contact',
+    memory: '24 GB GDDR6 per module (Wormhole)',
+    compute: '466 TFLOPs (FP8) per n300d',
+    formFactor: '4U rack',
+  },
+  galaxy: {
+    price: 'Contact',
+    memory: '384 GB GDDR6 (global)',
+    compute: '9.3 PetaFLOPS (FP8)',
+    formFactor: 'Rack server, 12 kW',
+  },
+};
+
 const RECOMMENDATION_MAP: Record<string, string> = {
   'desk|box|research': 'bh-quietbox',
   'desk|box|efficiency': 'bh-quietbox',
@@ -102,12 +139,65 @@ function getRecommendedProduct(answers: Answers): Product {
   return fallback ?? products[0];
 }
 
+function getRunnerUp(product: Product): Product | null {
+  const runnerUpId = RUNNER_UP_MAP[product.id];
+  if (!runnerUpId) return null;
+  const runnerUp = products.find((p) => p.id === runnerUpId);
+  return runnerUp ?? null;
+}
+
 function getArchitecturalEdge(product: Product, useCase: string): string {
   const byUse = HIGHLIGHTS_BY_JOURNEY[product.id];
   if (byUse && (useCase === 'research' || useCase === 'efficiency' || useCase === 'fleet')) {
     return byUse[useCase];
   }
   return product.highlight;
+}
+
+function RunnerUpComparison({ primary, runnerUp }: { primary: Product; runnerUp: Product }) {
+  const primarySpecs = SPECS_BY_PRODUCT[primary.id];
+  const runnerUpSpecs = SPECS_BY_PRODUCT[runnerUp.id];
+  if (!primarySpecs || !runnerUpSpecs) return null;
+  const rows: { label: string; primary: string; runnerUp: string }[] = [
+    { label: 'Price', primary: primarySpecs.price, runnerUp: runnerUpSpecs.price },
+    { label: 'Memory', primary: primarySpecs.memory, runnerUp: runnerUpSpecs.memory },
+    { label: 'Compute', primary: primarySpecs.compute, runnerUp: runnerUpSpecs.compute },
+    { label: 'Form factor', primary: primarySpecs.formFactor, runnerUp: runnerUpSpecs.formFactor },
+  ];
+  return (
+    <div className="mt-10 w-full text-left border border-slate-plus rounded-lg bg-white p-6">
+      <p className="text-sm font-mono uppercase tracking-widest text-tt-black/50 mb-2">Our runner-up</p>
+      <h2 className="text-xl font-display font-medium text-tt-black mb-1">{runnerUp.name}</h2>
+      <p className="text-sm font-body text-tt-black/70 mb-6">{runnerUp.tagline}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full font-body text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-slate-plus">
+              <th className="py-2 pr-4 font-mono uppercase tracking-wider text-tt-black/60 font-medium">Spec</th>
+              <th className="py-2 pr-4 font-medium text-tt-black">Your match</th>
+              <th className="py-2 font-medium text-tt-black">Runner-up</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.label} className="border-b border-slate-plus/60">
+                <td className="py-2.5 pr-4 font-mono text-tt-black/60">{row.label}</td>
+                <td className="py-2.5 pr-4 text-tt-black">{row.primary}</td>
+                <td className="py-2.5 text-tt-black">{row.runnerUp}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <a
+        href="#"
+        className="inline-block mt-4 text-sm font-body font-medium hover:opacity-90"
+        style={{ color: runnerUp.brand_color }}
+      >
+        {runnerUp.cta} →
+      </a>
+    </div>
+  );
 }
 
 function ResultCard({ product, useCase }: { product: Product; useCase: string }) {
@@ -197,8 +287,11 @@ export function ProductSelector() {
           </div>
         )}
         {isResultStep ? (
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start w-full max-w-3xl">
             <ResultCard product={recommendedProduct} useCase={answers.use} />
+            {getRunnerUp(recommendedProduct) && (
+              <RunnerUpComparison primary={recommendedProduct} runnerUp={getRunnerUp(recommendedProduct)!} />
+            )}
             <button type="button" onClick={() => setStepIndex(STEPS.length - 1)} className="mt-6 text-sm font-mono text-tt-black/50 hover:text-tt-black">← Change my answers</button>
           </div>
         ) : currentStep ? (
