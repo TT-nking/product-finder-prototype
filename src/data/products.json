@@ -1,0 +1,52 @@
+{
+  "products": [
+    {
+      "id": "bh-quietbox",
+      "name": "Blackhole QuietBox",
+      "tagline": "Liquid-cooled desktop. 4 Blackhole processors, 128 GB GDDR6.",
+      "env": "desk",
+      "assembly": "box",
+      "use": "research",
+      "highlight": "1MB of SRAM per tile for complex physics code and custom VM development. 720 MB total SRAM and 480 Tensix Cores in a quiet, liquid-cooled desktop.",
+      "software": ["TT-Metalium", "TT-NN"],
+      "cta": "Learn more",
+      "brand_color": "#6B21A8"
+    },
+    {
+      "id": "bh-p150a",
+      "name": "Blackhole P150a",
+      "tagline": "PCIe card. 32 GB GDDR6, 664 TFLOPs (BLOCKFP8).",
+      "env": "desk",
+      "assembly": "build",
+      "use": "research",
+      "highlight": "120 Tensix Cores and 32 GB GDDR6 per card, with full access to the metal via TT-Metalium and TT-NN.",
+      "software": ["TT-Metalium", "TT-NN"],
+      "cta": "Learn more",
+      "brand_color": "#6B21A8"
+    },
+    {
+      "id": "wh-loudbox",
+      "name": "Wormhole Loudbox (4U)",
+      "tagline": "4U rack system. Wormhole processors, dense inference.",
+      "env": "rack",
+      "assembly": "box",
+      "use": "efficiency",
+      "highlight": "4U rack density with strong performance per watt. Multi-tenant capable for cost-sensitive inference workloads.",
+      "software": ["TT-Forge", "TT-NN"],
+      "cta": "Contact sales",
+      "brand_color": "#4C1D95"
+    },
+    {
+      "id": "galaxy",
+      "name": "Tenstorrent Galaxy™",
+      "tagline": "Rack-scale system. 32 Wormhole processors, 384 GB GDDR6.",
+      "env": "rack",
+      "assembly": "box",
+      "use": "research",
+      "highlight": "32 Wormhole processors and 2,560 Tensix Cores in one rack-mounted system. 384 GB GDDR6, globally addressable.",
+      "software": ["TT-Forge", "TT-NN"],
+      "cta": "Contact sales",
+      "brand_color": "#5B21B6"
+    }
+  ]
+}
