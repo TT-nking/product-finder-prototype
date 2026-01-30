@@ -151,8 +151,8 @@ export function ProductSelector() {
   const handleAnswer = (key: keyof Answers, value: string) => { setAnswers((a) => ({ ...a, [key]: value })); };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-start p-8 md:p-12 bg-white">
-      <div className="w-full max-w-4xl">
+    <div className="w-full min-h-screen flex items-center justify-start bg-white px-6 py-10 sm:px-10 md:px-16 md:py-14">
+      <div className="w-full max-w-4xl mx-auto">
         {!isResultStep && (
           <div className="mb-10 flex items-center gap-2">
             {STEPS.filter((s) => s.id !== 'intro').map((s) => {
