@@ -111,3 +111,15 @@ git push -u origin main
 | Wait for workflow to finish; open `https://tt-nking.github.io/<repo-name>/` | |
 
 If the page is blank or assets don’t load, double-check that `base` in `vite.config.ts` matches the repo name (with slashes).
+
+---
+
+## Troubleshooting
+
+**404 after enabling GitHub Actions**
+
+1. **Trigger the build** – The site is built when the “Deploy to GitHub Pages” workflow runs. Either:
+   - **Actions** tab → select “Deploy to GitHub Pages” → **Run workflow** → Run (no push needed), or  
+   - Push any commit to `main` (e.g. `git commit --allow-empty -m "Trigger build"` then `git push`).
+2. **Wait for the run to finish** – In **Actions**, open the latest run and confirm both “build” and “deploy” jobs complete (green).
+3. **Check the URL** – GitHub Pages uses your **repo name** in the URL. If your repo is `product-finder-prototype`, the site is `https://tt-nking.github.io/product-finder-prototype/` (trailing slash is fine). If you used a different repo name, update `base` in `vite.config.ts` to `'/your-repo-name/'` and push again so the workflow rebuilds.
