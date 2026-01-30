@@ -53,7 +53,7 @@ const STEPS = [
     title: 'How do you want to deploy?',
     question: 'Pre-built systems get you running faster; cards give you flexibility to build your own cluster.',
     options: [
-      { value: 'box', label: 'Pre-built system (box)', description: 'Ready to plug in and run' },
+      { value: 'box', label: 'Pre-built system', description: 'Ready to plug in and run' },
       { value: 'build', label: 'Cards only', description: "I'll build or integrate into my own chassis" },
     ],
   },
